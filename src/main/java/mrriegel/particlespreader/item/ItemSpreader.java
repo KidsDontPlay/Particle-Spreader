@@ -4,6 +4,7 @@ import mrriegel.limelib.LimeLib;
 import mrriegel.limelib.datapart.DataPart;
 import mrriegel.limelib.datapart.DataPartRegistry;
 import mrriegel.limelib.helper.ColorHelper;
+import mrriegel.limelib.helper.NBTHelper;
 import mrriegel.limelib.helper.ParticleHelper;
 import mrriegel.limelib.item.CommonItem;
 import mrriegel.limelib.particle.CommonParticle;
@@ -13,6 +14,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
@@ -77,9 +79,8 @@ public class ItemSpreader extends CommonItem {
 		public double minXMotion = 0., maxXMotion = 0., minYMotion = .03, maxYMotion = .03, minZMotion = 0., maxZMotion = 0.;
 		public double minScale = 1., maxScale = 2., flouncing = .06, frequence = 2., radius = 2.5, force = .1, spinSpeed = .01;
 		public float gravity = 0F;
-		public int rate = 4, color = 0xFFFFFFFF, brightness = -1, visibleRange = 32, rainbow = -1;
-		public int minAge = 40, maxAge = 80, colorDiff = 0, alpha = 255;
-		private int texture = 0;
+		public int rate = 4, color = 0xFFFFFF, brightness = -1, visibleRange = 32, rainbow = -1;
+		public int minAge = 40, maxAge = 80, colorDiff = 0, alpha = 255, texture = 0;
 		public boolean depth = true, collidable = false, reverse = false;
 		public ParticleVariant variant = ParticleVariant.NORMAL;
 		public Redstone red = Redstone.ALWAYS;
@@ -89,6 +90,51 @@ public class ItemSpreader extends CommonItem {
 
 		public void nextTexture() {
 			texture = (texture + 1) % textures.length;
+		}
+
+		@Override
+		public void readFromNBT(NBTTagCompound compound) {
+		}
+
+		@Override
+		public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+			NBTHelper.setDouble(compound, "minXPos", minXPos);
+			NBTHelper.setDouble(compound, "minYPos", minYPos);
+			NBTHelper.setDouble(compound, "minZPos", minZPos);
+			NBTHelper.setDouble(compound, "maxXPos", maxXPos);
+			NBTHelper.setDouble(compound, "maxYPos", maxYPos);
+			NBTHelper.setDouble(compound, "maxZPos", maxZPos);
+			NBTHelper.setDouble(compound, "minXMotion", minXMotion);
+			NBTHelper.setDouble(compound, "minYMotion", minYMotion);
+			NBTHelper.setDouble(compound, "minZMotion", minZMotion);
+			NBTHelper.setDouble(compound, "maxXMotion", maxXMotion);
+			NBTHelper.setDouble(compound, "maxYMotion", maxYMotion);
+			NBTHelper.setDouble(compound, "maxZMotion", maxZMotion);
+			NBTHelper.setDouble(compound, "minScale", minScale);
+			NBTHelper.setDouble(compound, "maxScale", maxScale);
+			NBTHelper.setDouble(compound, "flouncing", flouncing);
+			NBTHelper.setDouble(compound, "frequence", frequence);
+			NBTHelper.setDouble(compound, "radius", radius);
+			NBTHelper.setDouble(compound, "force", force);
+			NBTHelper.setDouble(compound, "spinSpeed", spinSpeed);
+			NBTHelper.setFloat(compound, "gravity", gravity);
+			NBTHelper.setInt(compound, "rate", rate);
+			NBTHelper.setInt(compound, "color", color);
+			NBTHelper.setInt(compound, "brightness", brightness);
+			NBTHelper.setInt(compound, "visibleRange", visibleRange);
+			NBTHelper.setInt(compound, "rainbow", rainbow);
+			NBTHelper.setInt(compound, "minAge", minAge);
+			NBTHelper.setInt(compound, "maxAge", maxAge);
+			NBTHelper.setInt(compound, "colorDiff", colorDiff);
+			NBTHelper.setInt(compound, "alpha", alpha);
+			NBTHelper.setInt(compound, "texture", texture);
+			NBTHelper.setBoolean(compound, "depth", depth);
+			NBTHelper.setBoolean(compound, "collidable", collidable);
+			NBTHelper.setBoolean(compound, "reverse", reverse);
+			NBTHelper.setInt(compound, "variant", variant.ordinal());
+			NBTHelper.setInt(compound, "red", red.ordinal());
+			NBTHelper.setInt(compound, "ax", ax.ordinal());
+			return super.writeToNBT(compound);
 		}
 
 		@Override
@@ -133,7 +179,7 @@ public class ItemSpreader extends CommonItem {
 				break;
 			}
 			case CIRCLE: {
-				for (Vec3d vec : ParticleHelper.getVecsForCircle(posX(), posY(), posZ(), radius, frequence, Axis.Y)) {
+				for (Vec3d vec : ParticleHelper.getVecsForCircle(posX(), posY(), posZ(), radius, frequence, ax)) {
 					CommonParticle par = new CommonParticle(vec.xCoord, vec.yCoord, vec.zCoord, Utils.getRandomNumber(minXMotion, maxXMotion), Utils.getRandomNumber(minYMotion, maxYMotion), Utils.getRandomNumber(minZMotion, maxZMotion));
 					applyValues(par);
 					LimeLib.proxy.renderParticle(par);

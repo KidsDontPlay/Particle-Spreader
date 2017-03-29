@@ -4,7 +4,7 @@ import mrriegel.limelib.network.PacketHandler;
 import mrriegel.particlespreader.ParticleSpreader;
 import mrriegel.particlespreader.handler.ConfigHandler;
 import mrriegel.particlespreader.handler.GuiHandler;
-import mrriegel.particlespreader.network.MessageButton;
+import mrriegel.particlespreader.network.MessageToServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -22,7 +22,7 @@ public class CommonProxy {
 	public void init(FMLInitializationEvent event) {
 		NetworkRegistry.INSTANCE.registerGuiHandler(ParticleSpreader.instance, new GuiHandler());
 		MinecraftForge.EVENT_BUS.register(CommonProxy.class);
-		PacketHandler.registerMessage(MessageButton.class, Side.SERVER);
+		PacketHandler.registerMessage(MessageToServer.class, Side.SERVER);
 	}
 
 	public void postInit(FMLPostInitializationEvent event) {
