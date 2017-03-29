@@ -1,11 +1,9 @@
 package mrriegel.particlespreader.item;
 
-import java.awt.Color;
-import java.util.stream.DoubleStream;
-
 import mrriegel.limelib.LimeLib;
 import mrriegel.limelib.datapart.DataPart;
 import mrriegel.limelib.datapart.DataPartRegistry;
+import mrriegel.limelib.helper.ColorHelper;
 import mrriegel.limelib.helper.ParticleHelper;
 import mrriegel.limelib.item.CommonItem;
 import mrriegel.limelib.particle.CommonParticle;
@@ -30,6 +28,7 @@ public class ItemSpreader extends CommonItem {
 	public ItemSpreader() {
 		super("spreader");
 		setCreativeTab(CreativeTabs.DECORATIONS);
+		setMaxStackSize(1);
 	}
 
 	@Override
@@ -56,20 +55,35 @@ public class ItemSpreader extends CommonItem {
 
 	public static enum ParticleVariant {
 		NORMAL, CIRCLE, SPIRALE, EXPLOSION;
+		private static ParticleVariant[] vals = values();
+
+		public ParticleVariant next() {
+			return vals[(this.ordinal() + 1) % vals.length];
+		}
+	}
+
+	public static enum Redstone {
+		ALWAYS, NEVER, ON, OFF;
+		private static Redstone[] vals = values();
+
+		public Redstone next() {
+			return vals[(this.ordinal() + 1) % vals.length];
+		}
 	}
 
 	public static class ParticlePart extends DataPart {
 
 		public double minXPos = .4, maxXPos = .6, minYPos = .4, maxYPos = .6, minZPos = .4, maxZPos = .6;
 		public double minXMotion = 0., maxXMotion = 0., minYMotion = .03, maxYMotion = .03, minZMotion = 0., maxZMotion = 0.;
-		public double minScale = 1, maxScale = 2, flouncing = .1, frequence = 2.;
+		public double minScale = 1., maxScale = 2., flouncing = .06, frequence = 2., radius = 2.5, force = .1, spinSpeed = .01;
 		public float gravity = 0F;
-		public int rate = 4, color = Color.WHITE.getRGB(), brightness = -1, visibleRange = 32;
-		public int minAge = 40, maxAge = 80;
+		public int rate = 4, color = 0xFFFFFFFF, brightness = -1, visibleRange = 32, rainbow = -1;
+		public int minAge = 40, maxAge = 80, colorDiff = 0, alpha = 255;
 		private int texture = 0;
-		public boolean depth = true, collidable = false;
+		public boolean depth = true, collidable = false, reverse = false;
 		public ParticleVariant variant = ParticleVariant.NORMAL;
-		public Axis ax=Axis.Y;
+		public Redstone red = Redstone.ALWAYS;
+		public Axis ax = Axis.Y;
 
 		public static String[] textures = new String[] { "round", "sparkle", "square" };
 
@@ -91,49 +105,72 @@ public class ItemSpreader extends CommonItem {
 			}
 		}
 
+		private boolean redstoneValid() {
+			switch (red) {
+			case ALWAYS:
+				return true;
+			case NEVER:
+				return false;
+			case ON:
+				return world.isBlockPowered(pos);
+			case OFF:
+				return !world.isBlockPowered(pos);
+			default:
+				return false;
+			}
+
+		}
+
 		@Override
 		public void updateClient(World world) {
-			if (ticksExisted % rate != 0)
+			if (ticksExisted % rate != 0 || !redstoneValid())
 				return;
-			variant = ParticleVariant.EXPLOSION;
 			switch (variant) {
+			case NORMAL: {
+				CommonParticle par = new CommonParticle(posX(), posY(), posZ(), motionX(), motionY(), motionZ());
+				applyValues(par);
+				LimeLib.proxy.renderParticle(par);
+				break;
+			}
 			case CIRCLE: {
-				for (Vec3d vec : ParticleHelper.getVecsForCircle(getX() + Utils.getRandomNumber(minXPos, maxXPos), getY() + Utils.getRandomNumber(minYPos, maxYPos), getZ() + Utils.getRandomNumber(minZPos, maxZPos), 2.4, frequence, Axis.Y)) {
+				for (Vec3d vec : ParticleHelper.getVecsForCircle(posX(), posY(), posZ(), radius, frequence, Axis.Y)) {
 					CommonParticle par = new CommonParticle(vec.xCoord, vec.yCoord, vec.zCoord, Utils.getRandomNumber(minXMotion, maxXMotion), Utils.getRandomNumber(minYMotion, maxYMotion), Utils.getRandomNumber(minZMotion, maxZMotion));
 					applyValues(par);
 					LimeLib.proxy.renderParticle(par);
 				}
 				break;
 			}
-			case NORMAL: {
-				CommonParticle par = new CommonParticle(getX() + Utils.getRandomNumber(minXPos, maxXPos), getY() + Utils.getRandomNumber(minYPos, maxYPos), getZ() + Utils.getRandomNumber(minZPos, maxZPos), Utils.getRandomNumber(minXMotion, maxXMotion), Utils.getRandomNumber(minYMotion, maxYMotion), Utils.getRandomNumber(minZMotion, maxZMotion));
-				applyValues(par);
-				LimeLib.proxy.renderParticle(par);
-				break;
-			}
 			case SPIRALE: {
-				double motion = DoubleStream.of(Utils.getRandomNumber(minXMotion, maxXMotion), Utils.getRandomNumber(minYMotion, maxYMotion), Utils.getRandomNumber(minZMotion, maxZMotion)).average().getAsDouble();
-				Vec3d vec = ParticleHelper.getVecForSpirale(motion + .04d, .02d, frequence*5, false, ax);
-				CommonParticle par = new CommonParticle(getX() + Utils.getRandomNumber(minXPos, maxXPos), getY() + Utils.getRandomNumber(minYPos, maxYPos), getZ() + Utils.getRandomNumber(minZPos, maxZPos), ax == Axis.X ? Utils.getRandomNumber(minXMotion, maxXMotion) : vec.xCoord, ax == Axis.Y ? Utils.getRandomNumber(minYMotion, maxYMotion) : vec.yCoord, ax == Axis.Z ? Utils.getRandomNumber(minZMotion, maxZMotion) : vec.zCoord);
+				Vec3d vec = ParticleHelper.getVecForSpirale(force, spinSpeed, frequence + 40., reverse, ax);
+				CommonParticle par = new CommonParticle(posX(), posY(), posZ(), ax == Axis.X ? motionX() : vec.xCoord, ax == Axis.Y ? motionY() : vec.yCoord, ax == Axis.Z ? motionZ() : vec.zCoord);
 				applyValues(par);
 				LimeLib.proxy.renderParticle(par);
 				break;
 			}
 			case EXPLOSION: {
-				for (Vec3d vec : ParticleHelper.getVecsForExplosion(.2, frequence*10, ax)) {
-					CommonParticle par = new CommonParticle(getX() + Utils.getRandomNumber(minXPos, maxXPos), getY() + Utils.getRandomNumber(minYPos, maxYPos), getZ() + Utils.getRandomNumber(minZPos, maxZPos), ax == Axis.X ? Utils.getRandomNumber(minXMotion, maxXMotion) : vec.xCoord, ax == Axis.Y ? Utils.getRandomNumber(minYMotion, maxYMotion) : vec.yCoord, ax == Axis.Z ? Utils.getRandomNumber(minZMotion, maxZMotion) : vec.zCoord);
+				for (Vec3d vec : ParticleHelper.getVecsForExplosion(force, frequence + 20., ax)) {
+					CommonParticle par = new CommonParticle(posX(), posY(), posZ(), ax == Axis.X ? motionX() : vec.xCoord, ax == Axis.Y ? motionY() : vec.yCoord, ax == Axis.Z ? motionZ() : vec.zCoord);
 					applyValues(par);
 					LimeLib.proxy.renderParticle(par);
 				}
 				break;
 			}
-
 			}
 		}
 
+		//@formatter:off
+		double posX() {return getX() + Utils.getRandomNumber(minXPos, maxXPos);}
+		double posY() {return getY() + Utils.getRandomNumber(minYPos, maxYPos);}
+		double posZ() {return getZ() + Utils.getRandomNumber(minZPos, maxZPos);}
+		double motionX() {return Utils.getRandomNumber(minXMotion, maxXMotion);}
+		double motionY() {return Utils.getRandomNumber(minYMotion, maxYMotion);}
+		double motionZ() {return Utils.getRandomNumber(minZMotion, maxZMotion);}
+		//@formatter:on
+
 		private void applyValues(CommonParticle par) {
 			par.setScale((float) Utils.getRandomNumber(minScale, maxScale));
-			par.setColor(color, 0);
+			int col = ColorHelper.getRGB(rainbow > 0 ? ColorHelper.getRainbow(rainbow) : color, alpha);
+			par.setColor(col, colorDiff);
 			par.setFlouncing(flouncing / 10.);
 			par.setBrightness(brightness);
 			par.setDepth(depth);
@@ -148,12 +185,6 @@ public class ItemSpreader extends CommonItem {
 				par.setTexture(ParticleHelper.squareParticle);
 			par.setGravity(gravity);
 			par.setNoClip(!collidable);
-			if (false) {
-				par.setFlouncing(0);
-				minYMotion = 0;
-				maxYMotion = 0;
-				par.setMaxAge2(4);
-			}
 		}
 
 		@Override
