@@ -3,7 +3,7 @@ package mrriegel.particlespreader.network;
 import mrriegel.limelib.datapart.DataPart;
 import mrriegel.limelib.datapart.DataPartRegistry;
 import mrriegel.limelib.network.AbstractMessage;
-import mrriegel.particlespreader.item.ItemSpreader.ParticlePart;
+import mrriegel.particlespreader.ParticlePart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;

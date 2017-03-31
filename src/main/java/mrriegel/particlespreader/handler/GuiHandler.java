@@ -1,8 +1,8 @@
 package mrriegel.particlespreader.handler;
 
 import mrriegel.limelib.datapart.DataPartRegistry;
+import mrriegel.particlespreader.ParticlePart;
 import mrriegel.particlespreader.gui.GuiSpreader;
-import mrriegel.particlespreader.item.ItemSpreader.ParticlePart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;

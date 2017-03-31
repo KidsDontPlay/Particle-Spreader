@@ -1,6 +1,6 @@
 {
     "parent" : "item/handheld", 
     "textures" : {
-        "layer0" : "particlespreader:items/swordi"
+        "layer0" : "limelib:particle/round_particle"
     }
 }
