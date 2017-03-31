@@ -1,5 +1,7 @@
 package mrriegel.particlespreader;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import mrriegel.limelib.LimeLib;
@@ -8,20 +10,22 @@ import mrriegel.limelib.helper.ColorHelper;
 import mrriegel.limelib.helper.NBTHelper;
 import mrriegel.limelib.helper.ParticleHelper;
 import mrriegel.limelib.particle.CommonParticle;
-import mrriegel.particlespreader.item.ItemSpreader.ParticleVariant;
-import mrriegel.particlespreader.item.ItemSpreader.Redstone;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumFacing.Axis;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public class ParticlePart extends DataPart {
 
@@ -36,8 +40,14 @@ public class ParticlePart extends DataPart {
 	public Redstone red = Redstone.ALWAYS;
 	public Axis ax = Axis.Y;
 
-	public static String[] textures = new String[] { "round", "sparkle", "square" };
+	static Map<String, ResourceLocation> textureMap = Maps.newHashMap();
+	public static String[] textures = new String[] { "round", "sparkle", "square", "random" };
 	private static Random random = new Random();
+	static {
+		textureMap.put("round", ParticleHelper.roundParticle);
+		textureMap.put("sparkle", ParticleHelper.sparkleParticle);
+		textureMap.put("square", ParticleHelper.squareParticle);
+	}
 
 	public void nextTexture() {
 		texture = (texture + 1) % textures.length;
@@ -55,12 +65,13 @@ public class ParticlePart extends DataPart {
 		flouncing = Math.max(flouncing, 0.);
 		frequency = Math.max(frequency, 0.);
 		radius = Math.max(radius, 0.);
-		spinSpeed = Math.max(spinSpeed, 0.);
+		spinSpeed = Math.max(spinSpeed, 0.01);
 		rate = Math.max(rate, 1);
 		visibleRange = Math.max(visibleRange, 0);
 		minAge = Math.max(minAge, 1);
 		maxAge = MathHelper.clamp(maxAge, minAge, 133777);
 		colorDiff = MathHelper.clamp(colorDiff, 0, 255);
+		texture %= textures.length;
 	}
 
 	@Override
@@ -160,6 +171,7 @@ public class ParticlePart extends DataPart {
 
 	@Override
 	public void updateClient(World world) {
+		ParticleSpreader.proxy.highlightPart(pos);
 		if (ticksExisted % rate != 0 || !redstoneValid())
 			return;
 		//			correctValues();
@@ -186,9 +198,19 @@ public class ParticlePart extends DataPart {
 			}
 			break;
 		}
-		case SPIRAL: {
+		case SPIRAL1: {
 			Vec3d vec = ParticleHelper.getVecForSpirale(radius / 25., spinSpeed / 10., frequency + 40., reverse, ax);
 			CommonParticle par = new CommonParticle(posX(), posY(), posZ(), ax == Axis.X ? motionX() : vec.xCoord, ax == Axis.Y ? motionY() : vec.yCoord, ax == Axis.Z ? motionZ() : vec.zCoord);
+			applyValues(par);
+			LimeLib.proxy.renderParticle(par);
+			break;
+		}
+		case SPIRAL2: {
+			List<Vec3d> lis = ParticleHelper.getVecsForCircle(posX(), posY(), posZ(), radius, frequency * 2, ax);
+			int index = ((int) ((ticksExisted) * (spinSpeed * 10.1))) % lis.size();
+			//			index=ticksExisted%lis.size();
+			Vec3d vec = lis.get(index);
+			CommonParticle par = new CommonParticle(vec.xCoord, vec.yCoord, vec.zCoord, MathHelper.nextDouble(random, minXMotion, maxXMotion), MathHelper.nextDouble(random, minYMotion, maxYMotion), MathHelper.nextDouble(random, minZMotion, maxZMotion));
 			applyValues(par);
 			LimeLib.proxy.renderParticle(par);
 			break;
@@ -214,12 +236,8 @@ public class ParticlePart extends DataPart {
 		par.setSmoothEnd(true);
 		par.setVisibleRange(visibleRange);
 		par.setMaxAge2(MathHelper.getInt(random, minAge, maxAge));
-		if (textures[texture].equalsIgnoreCase("round"))
-			par.setTexture(ParticleHelper.roundParticle);
-		else if (textures[texture].equalsIgnoreCase("sparkle"))
-			par.setTexture(ParticleHelper.sparkleParticle);
-		else if (textures[texture].equalsIgnoreCase("square"))
-			par.setTexture(ParticleHelper.squareParticle);
+		ResourceLocation loc = textures[texture].equals("random") ? Lists.newArrayList(textureMap.values()).get(new Random().nextInt(textureMap.values().size())) : textureMap.get(textures[texture]);
+		par.setTexture(loc != null ? loc : ParticleHelper.roundParticle);
 		par.setGravity(gravity);
 		par.setNoClip(!collidable);
 	}
@@ -246,5 +264,23 @@ public class ParticlePart extends DataPart {
 	@Override
 	public AxisAlignedBB getHighlightBox() {
 		return new AxisAlignedBB(.3, .3, .3, .7, .7, .7);
+	}
+
+	public static enum ParticleVariant {
+		NORMAL, CIRCLE, SQUARE, SPIRAL1, SPIRAL2, EXPLOSION;
+		private static ParticleVariant[] vals = values();
+
+		public ParticleVariant next() {
+			return vals[(this.ordinal() + 1) % vals.length];
+		}
+	}
+
+	public static enum Redstone {
+		ALWAYS, NEVER, ON, OFF;
+		private static Redstone[] vals = values();
+
+		public Redstone next() {
+			return vals[(this.ordinal() + 1) % vals.length];
+		}
 	}
 }

@@ -18,6 +18,7 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 import net.minecraftforge.fml.client.config.GuiSlider;
 
@@ -48,7 +49,7 @@ public class GuiSpreader extends CommonGuiScreen {
 			Double.parseDouble(s);
 			return !s.chars().anyMatch(i -> set.stream().anyMatch(c -> c == i));
 		} catch (Exception e) {
-			return s.equals("-")||s.equals(".");
+			return s.equals("-") || s.equals(".");
 		}
 	};
 	private static Predicate<String> predInt = s -> {
@@ -65,7 +66,7 @@ public class GuiSpreader extends CommonGuiScreen {
 	public GuiSpreader(ParticlePart part) {
 		this.part = part;
 		ySize = 220;
-		xSize = 260;
+		xSize = 248;
 	}
 
 	private void toServer() {
@@ -155,14 +156,14 @@ public class GuiSpreader extends CommonGuiScreen {
 	public void initGui() {
 		super.initGui();
 		reg = DataPartRegistry.get(mc.world);
-		buttonList.add(new GuiButtonSimple(-1, 216 + guiLeft, 201 + guiTop, 40, 14, "Color", 0xff000000, part.color, null));
-		buttonList.add(particle = new GuiButtonSimple(0, 5 + guiLeft, 6 + guiTop, 55, 12, "", Collections.singletonList("Particle")));
-		buttonList.add(redstone = new GuiButtonSimple(1, 64 + guiLeft, 6 + guiTop, 55, 12, "", Collections.singletonList("Redstone")));
+		buttonList.add(new GuiButtonSimple(-1, 194 + guiLeft, 201 + guiTop, 44, 14, "Color", 0xff000000, part.color, null));
+		buttonList.add(particle = new GuiButtonSimple(0, 5 + guiLeft, 6 + guiTop, 55, 12, "", Collections.singletonList("Particle Mode")));
+		buttonList.add(redstone = new GuiButtonSimple(1, 64 + guiLeft, 6 + guiTop, 55, 12, "", Collections.singletonList("Redstone Mode")));
 		buttonList.add(axis = new GuiButtonSimple(2, 124 + guiLeft, 6 + guiTop, 55, 12, "", Collections.singletonList("Axis")));
 		buttonList.add(texture = new GuiButtonSimple(3, 184 + guiLeft, 6 + guiTop, 55, 12, "", Collections.singletonList("Texture")));
-		buttonList.add(depth = new GuiCheckBox(4, 120 + guiLeft, 189 + guiTop, "Depth", part.depth));
-		buttonList.add(collidable = new GuiCheckBox(5, 120 + guiLeft, 202 + guiTop, "Collidable", part.collidable));
-		buttonList.add(reverse = new GuiCheckBox(6, 170 + guiLeft, 189 + guiTop, "Reverse", part.reverse));
+		buttonList.add(depth = new GuiCheckBox(4, 120 + guiLeft, 189 + guiTop, "", part.depth));
+		buttonList.add(collidable = new GuiCheckBox(5, 120 + guiLeft, 202 + guiTop, "", part.collidable));
+		buttonList.add(reverse = new GuiCheckBox(6, 170 + guiLeft, 189 + guiTop, "", part.reverse));
 		minXp = getTextField(19, 35, part.minXPos + "", true);
 		maxXp = getTextField(67, 35, part.maxXPos + "", true);
 		minYp = getTextField(19, 51, part.minYPos + "", true);
@@ -201,6 +202,8 @@ public class GuiSpreader extends CommonGuiScreen {
 		return text;
 	}
 
+	int textColor = Color.darkGray.getRGB();
+
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		drawDefaultBackground();
@@ -208,22 +211,22 @@ public class GuiSpreader extends CommonGuiScreen {
 		super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 		//position
 		drawer.drawFrame(minXp.xPosition - 12 - guiLeft, minXp.yPosition - 4 - guiTop, 108, 51, 1, Color.gray.getRGB());
-		fontRenderer.drawString("Position", minXp.xPosition - 7, minXp.yPosition - 13, Color.darkGray.getRGB());
-		fontRenderer.drawString("X", minXp.xPosition - 9, minXp.yPosition + 2, Color.darkGray.getRGB());
-		fontRenderer.drawString("Y", minYp.xPosition - 9, minYp.yPosition + 2, Color.darkGray.getRGB());
-		fontRenderer.drawString("Z", minZp.xPosition - 9, minZp.yPosition + 2, Color.darkGray.getRGB());
+		fontRenderer.drawString("Position", minXp.xPosition - 7, minXp.yPosition - 13, textColor);
+		fontRenderer.drawString("X", minXp.xPosition - 9, minXp.yPosition + 4, textColor);
+		fontRenderer.drawString("Y", minYp.xPosition - 9, minYp.yPosition + 4, textColor);
+		fontRenderer.drawString("Z", minZp.xPosition - 9, minZp.yPosition + 4, textColor);
 		//motion
 		drawer.drawFrame(minXm.xPosition - 12 - guiLeft, minXm.yPosition - 4 - guiTop, 108, 51, 1, Color.gray.getRGB());
-		fontRenderer.drawString("Motion", minXm.xPosition - 7, minXm.yPosition - 13, Color.darkGray.getRGB());
-		fontRenderer.drawString("X", minXm.xPosition - 9, minXm.yPosition + 2, Color.darkGray.getRGB());
-		fontRenderer.drawString("Y", minYm.xPosition - 9, minYm.yPosition + 2, Color.darkGray.getRGB());
-		fontRenderer.drawString("Z", minZm.xPosition - 9, minZm.yPosition + 2, Color.darkGray.getRGB());
+		fontRenderer.drawString("Motion", minXm.xPosition - 7, minXm.yPosition - 13, textColor);
+		fontRenderer.drawString("X", minXm.xPosition - 9, minXm.yPosition + 4, textColor);
+		fontRenderer.drawString("Y", minYm.xPosition - 9, minYm.yPosition + 4, textColor);
+		fontRenderer.drawString("Z", minZm.xPosition - 9, minZm.yPosition + 4, textColor);
 		//scale
 		drawer.drawFrame(minScale.xPosition - 12 - guiLeft, minScale.yPosition - 4 - guiTop, 108, 19, 1, Color.gray.getRGB());
-		fontRenderer.drawString("Scale", minScale.xPosition - 7, minScale.yPosition - 13, Color.darkGray.getRGB());
+		fontRenderer.drawString("Scale", minScale.xPosition - 7, minScale.yPosition - 13, textColor);
 		//age
 		drawer.drawFrame(minAge.xPosition - 12 - guiLeft, minAge.yPosition - 4 - guiTop, 108, 19, 1, Color.gray.getRGB());
-		fontRenderer.drawString("Age", minAge.xPosition - 7, minAge.yPosition - 13, Color.darkGray.getRGB());
+		fontRenderer.drawString("Age", minAge.xPosition - 7, minAge.yPosition - 13, textColor);
 
 		drawString(flounc, "Flouncing");
 		drawString(freq, "Frequency");
@@ -236,11 +239,19 @@ public class GuiSpreader extends CommonGuiScreen {
 		drawString(rainbow, "Rainbow");
 		drawString(colordiff, "Color Variant");
 
+		drawString(depth, "Depth");
+		drawString(collidable, "Collidable");
+		drawString(reverse, "Reverse");
+
 		textFields.forEach(GuiTextField::drawTextBox);
 	}
 
 	private void drawString(GuiTextField field, String text) {
-		fontRenderer.drawString(text, field.xPosition - (fontRenderer.getStringWidth(text) + 4), field.yPosition + 2, Color.darkGray.getRGB());
+		fontRenderer.drawString(text, field.xPosition - (fontRenderer.getStringWidth(text) + 4), field.yPosition + 4, textColor);
+	}
+
+	private void drawString(GuiCheckBox field, String text) {
+		fontRenderer.drawString(text, field.xPosition + 14, field.yPosition + 3, textColor);
 	}
 
 	@Override
@@ -253,7 +264,7 @@ public class GuiSpreader extends CommonGuiScreen {
 		particle.displayString = part.variant.toString();
 		redstone.displayString = part.red.toString();
 		axis.displayString = part.ax.getName().toUpperCase();
-		texture.displayString = WordUtils.capitalize(ParticlePart.textures[part.texture]);
+		texture.displayString = (ParticlePart.textures[part.texture].equals("random") ? TextFormatting.ITALIC.toString() : "") + WordUtils.capitalize(ParticlePart.textures[part.texture]);
 	}
 
 	@Override
@@ -348,11 +359,6 @@ public class GuiSpreader extends CommonGuiScreen {
 		}
 
 		@Override
-		protected void actionPerformed(GuiButton button) throws IOException {
-			super.actionPerformed(button);
-		}
-
-		@Override
 		public void updateScreen() {
 			super.updateScreen();
 			int red = (int) MathHelper.clamp(((GuiSlider) buttonList.get(0)).sliderValue * 255, 0, 255);
@@ -367,6 +373,19 @@ public class GuiSpreader extends CommonGuiScreen {
 		protected void mouseReleased(int mouseX, int mouseY, int state) {
 			parent.toServer();
 			super.mouseReleased(mouseX, mouseY, state);
+		}
+
+		@Override
+		protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+			super.mouseClicked(mouseX, mouseY, mouseButton);
+			boolean in = mouseX > guiLeft && mouseX < guiLeft + width && mouseY > guiTop && mouseX < guiTop + height;
+			if (!in && mouseButton == 0)
+				try {
+					keyTyped('a', Keyboard.KEY_ESCAPE);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		}
 
 		@Override

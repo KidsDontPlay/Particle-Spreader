@@ -46,22 +46,4 @@ public class ItemSpreader extends CommonItem {
 		}
 	}
 
-	public static enum ParticleVariant {
-		NORMAL, CIRCLE, SQUARE, SPIRAL, EXPLOSION;
-		private static ParticleVariant[] vals = values();
-
-		public ParticleVariant next() {
-			return vals[(this.ordinal() + 1) % vals.length];
-		}
-	}
-
-	public static enum Redstone {
-		ALWAYS, NEVER, ON, OFF;
-		private static Redstone[] vals = values();
-
-		public Redstone next() {
-			return vals[(this.ordinal() + 1) % vals.length];
-		}
-	}
-
 }

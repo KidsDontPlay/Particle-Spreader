@@ -1,6 +1,7 @@
 package mrriegel.particlespreader.proxy;
 
 import java.awt.Color;
+import java.util.Random;
 
 import mrriegel.limelib.datapart.RenderRegistry;
 import mrriegel.limelib.helper.ColorHelper;
@@ -8,6 +9,7 @@ import mrriegel.limelib.particle.CommonParticle;
 import mrriegel.particlespreader.ParticlePart;
 import mrriegel.particlespreader.ParticleSpreader;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
@@ -15,6 +17,9 @@ import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -80,6 +85,14 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void postInit(FMLPostInitializationEvent event) {
 		super.postInit(event);
+	}
+
+	@Override
+	public void highlightPart(BlockPos pos) {
+		if (GuiScreen.isShiftKeyDown() && GuiScreen.isCtrlKeyDown()) {
+			Random random = new Random();
+			Minecraft.getMinecraft().world.spawnParticle(EnumParticleTypes.VILLAGER_HAPPY, MathHelper.nextDouble(random, 0, 1) + pos.getX(), MathHelper.nextDouble(random, 0, 1) + pos.getY(), MathHelper.nextDouble(random, 0, 1) + pos.getZ(), 0, 0, 0);
+		}
 	}
 
 }

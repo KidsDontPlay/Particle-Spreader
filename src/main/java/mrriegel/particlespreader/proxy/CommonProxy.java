@@ -5,6 +5,7 @@ import mrriegel.particlespreader.ParticleSpreader;
 import mrriegel.particlespreader.handler.ConfigHandler;
 import mrriegel.particlespreader.handler.GuiHandler;
 import mrriegel.particlespreader.network.MessageToServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -29,6 +30,9 @@ public class CommonProxy {
 	}
 
 	public void postInit(FMLPostInitializationEvent event) {
+	}
+	
+	public void highlightPart(BlockPos pos){
 	}
 
 }
