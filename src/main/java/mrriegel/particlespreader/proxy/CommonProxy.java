@@ -5,6 +5,7 @@ import mrriegel.particlespreader.ParticleSpreader;
 import mrriegel.particlespreader.handler.ConfigHandler;
 import mrriegel.particlespreader.handler.GuiHandler;
 import mrriegel.particlespreader.network.MessageToServer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -21,6 +22,7 @@ public class CommonProxy {
 		ConfigHandler.refreshConfig(event.getSuggestedConfigurationFile());
 		ParticleSpreader.spreader.registerItem();
 		GameRegistry.addRecipe(new ShapedOreRecipe(ParticleSpreader.spreader, "gdg", "dld", "gdg", 'g', "blockGlass", 'd', "dye", 'l', "dustGlowstone"));
+		GameRegistry.addShapelessRecipe(new ItemStack(ParticleSpreader.spreader), ParticleSpreader.spreader);
 	}
 
 	public void init(FMLInitializationEvent event) {
@@ -31,8 +33,8 @@ public class CommonProxy {
 
 	public void postInit(FMLPostInitializationEvent event) {
 	}
-	
-	public void highlightPart(BlockPos pos){
+
+	public void highlightPart(BlockPos pos) {
 	}
 
 }

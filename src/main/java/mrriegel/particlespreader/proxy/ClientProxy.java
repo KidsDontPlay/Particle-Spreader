@@ -38,12 +38,14 @@ public class ClientProxy extends CommonProxy {
 		Minecraft.getMinecraft().getItemColors().registerItemColorHandler((ItemStack stack, int tint) -> {
 			if (!stack.hasTagCompound())
 				return ColorHelper.getRainbow(25);
-			if ("".isEmpty())
-				return stack.getTagCompound().getInteger("color");
+			if ("".isEmpty()) {
+				return stack.getTagCompound().getCompoundTag("partdata_" + stack.getTagCompound().getInteger("active")).getInteger("color");
+				//				return stack.getTagCompound().getInteger("color");
+			}
 			ParticlePart part = new ParticlePart();
 			part.readFromNBT(stack.getTagCompound());
 			CommonParticle par = new CommonParticle(0, 0, 0);
-			part.applyValues(par);
+			part.applyValues(par, part.parDatas.get(part.activeParticle));
 			return new Color(par.getRedColorF(), par.getGreenColorF(), par.getBlueColorF()).getRGB();
 		}, ParticleSpreader.spreader);
 		if (!"".isEmpty())
