@@ -205,7 +205,7 @@ public class GuiSpreader extends CommonGuiScreen {
 	}
 
 	private GuiTextField getTextField(int x, int y, String s, boolean doub) {
-		GuiTextField text = new GuiTextField(textfieldid++, fontRenderer, x + guiLeft, y + guiTop, 44, 12);
+		GuiTextField text = new GuiTextField(textfieldid++, fontRendererObj, x + guiLeft, y + guiTop, 44, 12);
 		text.setMaxStringLength(6);
 		text.setText(s);
 		text.setTextColor(-1);
@@ -225,22 +225,22 @@ public class GuiSpreader extends CommonGuiScreen {
 		super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 		//position
 		drawer.drawFrame(minXp.xPosition - 12 - guiLeft, minXp.yPosition - 4 - guiTop, 108, 51, 1, Color.gray.getRGB());
-		fontRenderer.drawString("Position", minXp.xPosition - 7, minXp.yPosition - 13, textColor);
-		fontRenderer.drawString("X", minXp.xPosition - 9, minXp.yPosition + 4, textColor);
-		fontRenderer.drawString("Y", minYp.xPosition - 9, minYp.yPosition + 4, textColor);
-		fontRenderer.drawString("Z", minZp.xPosition - 9, minZp.yPosition + 4, textColor);
+		fontRendererObj.drawString("Position", minXp.xPosition - 7, minXp.yPosition - 13, textColor);
+		fontRendererObj.drawString("X", minXp.xPosition - 9, minXp.yPosition + 4, textColor);
+		fontRendererObj.drawString("Y", minYp.xPosition - 9, minYp.yPosition + 4, textColor);
+		fontRendererObj.drawString("Z", minZp.xPosition - 9, minZp.yPosition + 4, textColor);
 		//motion
 		drawer.drawFrame(minXm.xPosition - 12 - guiLeft, minXm.yPosition - 4 - guiTop, 108, 51, 1, Color.gray.getRGB());
-		fontRenderer.drawString("Motion", minXm.xPosition - 7, minXm.yPosition - 13, textColor);
-		fontRenderer.drawString("X", minXm.xPosition - 9, minXm.yPosition + 4, textColor);
-		fontRenderer.drawString("Y", minYm.xPosition - 9, minYm.yPosition + 4, textColor);
-		fontRenderer.drawString("Z", minZm.xPosition - 9, minZm.yPosition + 4, textColor);
+		fontRendererObj.drawString("Motion", minXm.xPosition - 7, minXm.yPosition - 13, textColor);
+		fontRendererObj.drawString("X", minXm.xPosition - 9, minXm.yPosition + 4, textColor);
+		fontRendererObj.drawString("Y", minYm.xPosition - 9, minYm.yPosition + 4, textColor);
+		fontRendererObj.drawString("Z", minZm.xPosition - 9, minZm.yPosition + 4, textColor);
 		//scale
 		drawer.drawFrame(minScale.xPosition - 12 - guiLeft, minScale.yPosition - 4 - guiTop, 108, 19, 1, Color.gray.getRGB());
-		fontRenderer.drawString("Scale", minScale.xPosition - 7, minScale.yPosition - 13, textColor);
+		fontRendererObj.drawString("Scale", minScale.xPosition - 7, minScale.yPosition - 13, textColor);
 		//age
 		drawer.drawFrame(minAge.xPosition - 12 - guiLeft, minAge.yPosition - 4 - guiTop, 108, 19, 1, Color.gray.getRGB());
-		fontRenderer.drawString("Age", minAge.xPosition - 7, minAge.yPosition - 13, textColor);
+		fontRendererObj.drawString("Age", minAge.xPosition - 7, minAge.yPosition - 13, textColor);
 
 		drawString(flounc, "Flouncing");
 		drawString(freq, "Frequency");
@@ -261,11 +261,11 @@ public class GuiSpreader extends CommonGuiScreen {
 	}
 
 	private void drawString(GuiTextField field, String text) {
-		fontRenderer.drawString(text, field.xPosition - (fontRenderer.getStringWidth(text) + 4), field.yPosition + 4, textColor);
+		fontRendererObj.drawString(text, field.xPosition - (fontRendererObj.getStringWidth(text) + 4), field.yPosition + 4, textColor);
 	}
 
 	private void drawString(GuiCheckBox field, String text) {
-		fontRenderer.drawString(text, field.xPosition + 14, field.yPosition + 3, textColor);
+		fontRendererObj.drawString(text, field.xPosition + 14, field.yPosition + 3, textColor);
 	}
 
 	@Override
@@ -330,6 +330,7 @@ public class GuiSpreader extends CommonGuiScreen {
 			part.getActive().collidable ^= true;
 		else if (button.id == 6)
 			part.getActive().reverse ^= true;
+		toServer();
 	}
 
 	@Override

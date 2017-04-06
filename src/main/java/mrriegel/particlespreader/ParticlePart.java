@@ -171,22 +171,45 @@ public class ParticlePart extends DataPart {
 	}
 
 	//@formatter:off
-	double posX(ParticleData parD) {return getX() + MathHelper.nextDouble(random,parD.minXPos,parD.maxXPos);}
-	double posY(ParticleData parD) {return getY() + MathHelper.nextDouble(random,parD.minYPos,parD.maxYPos);}
-	double posZ(ParticleData parD) {return getZ() + MathHelper.nextDouble(random,parD.minZPos,parD.maxZPos);}
-	double motionX(ParticleData parD) {return MathHelper.nextDouble(random,parD.minXMotion,parD.maxXMotion);}
-	double motionY(ParticleData parD) {return MathHelper.nextDouble(random,parD.minYMotion,parD.maxYMotion);}
-	double motionZ(ParticleData parD) {return MathHelper.nextDouble(random,parD.minZMotion,parD.maxZMotion);}
-	
+	double posX(ParticleData parD) {
+		return getX() + MathHelper.nextDouble(random, parD.minXPos, parD.maxXPos);
+	}
+
+	double posY(ParticleData parD) {
+		return getY() + MathHelper.nextDouble(random, parD.minYPos, parD.maxYPos);
+	}
+
+	double posZ(ParticleData parD) {
+		return getZ() + MathHelper.nextDouble(random, parD.minZPos, parD.maxZPos);
+	}
+
+	double motionX(ParticleData parD) {
+		return MathHelper.nextDouble(random, parD.minXMotion, parD.maxXMotion);
+	}
+
+	double motionY(ParticleData parD) {
+		return MathHelper.nextDouble(random, parD.minYMotion, parD.maxYMotion);
+	}
+
+	double motionZ(ParticleData parD) {
+		return MathHelper.nextDouble(random, parD.minZMotion, parD.maxZMotion);
+	}
+
 	private boolean redstoneValid(ParticleData parData) {
 		switch (parData.red) {
-		case ALWAYS:return true;
-		case NEVER:return false;
-		case ON:return world.isBlockPowered(pos);
-		case OFF:return !world.isBlockPowered(pos);
-		default:return false;
+		case ALWAYS:
+			return true;
+		case NEVER:
+			return false;
+		case ON:
+			return world.isBlockPowered(pos);
+		case OFF:
+			return !world.isBlockPowered(pos);
+		default:
+			return false;
 		}
 	}
+
 	//@formatter:on
 
 	@Override

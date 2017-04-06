@@ -54,8 +54,6 @@ public class ClientProxy extends CommonProxy {
 				public void render(ParticlePart part, double x, double y, double z, float partialTicks) {
 					ItemStack inputStack = new ItemStack(Blocks.OBSIDIAN);
 					Minecraft mc = Minecraft.getMinecraft();
-					if (inputStack == null || inputStack.isEmpty())
-						return;
 
 					GlStateManager.pushMatrix();
 					GlStateManager.translate(x, y, z);

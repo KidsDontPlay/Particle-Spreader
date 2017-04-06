@@ -28,15 +28,14 @@ public class ItemSpreader extends CommonItem {
 	}
 
 	@Override
-	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		ItemStack itemstack = player.getHeldItem(hand);
-		if (!itemstack.isEmpty() && player.canPlayerEdit(pos, facing, itemstack)) {
+	public EnumActionResult onItemUse(ItemStack itemstack, EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if (itemstack != null && player.canPlayerEdit(pos, facing, itemstack)) {
 			ParticlePart part = new ParticlePart();
 			if (itemstack.hasTagCompound())
 				part.readFromNBT(itemstack.getTagCompound());
 			if (DataPartRegistry.get(worldIn).addDataPart(pos.offset(facing), part, false)) {
 				if (!player.isCreative())
-					player.setHeldItem(hand, ItemHandlerHelper.copyStackWithSize(itemstack, itemstack.getCount() - 1));
+					player.setHeldItem(hand, ItemHandlerHelper.copyStackWithSize(itemstack, itemstack.stackSize - 1));
 				return EnumActionResult.SUCCESS;
 			} else {
 				return EnumActionResult.FAIL;
