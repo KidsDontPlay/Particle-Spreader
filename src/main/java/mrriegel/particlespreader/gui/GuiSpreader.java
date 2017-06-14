@@ -330,6 +330,7 @@ public class GuiSpreader extends CommonGuiScreen {
 			part.getActive().collidable ^= true;
 		else if (button.id == 6)
 			part.getActive().reverse ^= true;
+		toServer();
 	}
 
 	@Override
