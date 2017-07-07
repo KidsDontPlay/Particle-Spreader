@@ -2,14 +2,21 @@ package mrriegel.particlespreader.gui;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.text.WordUtils;
+import org.lwjgl.input.Keyboard;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import mrriegel.limelib.datapart.DataPartRegistry;
 import mrriegel.limelib.gui.CommonGuiScreen;
 import mrriegel.limelib.gui.GuiDrawer;
-import mrriegel.limelib.gui.button.GuiButtonSimple;
+import mrriegel.limelib.gui.button.CommonGuiButton;
+import mrriegel.limelib.gui.button.CommonGuiButton.Design;
 import mrriegel.limelib.helper.ColorHelper;
 import mrriegel.limelib.network.PacketHandler;
 import mrriegel.particlespreader.ParticlePart;
@@ -23,13 +30,6 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.client.config.GuiButtonExt;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 import net.minecraftforge.fml.client.config.GuiSlider;
-
-import org.apache.commons.lang3.text.WordUtils;
-import org.lwjgl.input.Keyboard;
-
-import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 public class GuiSpreader extends CommonGuiScreen {
 	ParticlePart part;
@@ -166,11 +166,11 @@ public class GuiSpreader extends CommonGuiScreen {
 		particles.clear();
 		particles.addAll(buttonList);
 		particles.get(part.activeParticle).enabled = false;
-		buttonList.add(new GuiButtonSimple(-1, 194 + guiLeft, 201 + guiTop, 44, 14, "Color", 0xff000000, part.getActive().color, null));
-		buttonList.add(particle = new GuiButtonSimple(0, 5 + guiLeft, 6 + guiTop, 55, 12, "", Collections.singletonList("Particle Mode")));
-		buttonList.add(redstone = new GuiButtonSimple(1, 64 + guiLeft, 6 + guiTop, 55, 12, "", Collections.singletonList("Redstone Mode")));
-		buttonList.add(axis = new GuiButtonSimple(2, 124 + guiLeft, 6 + guiTop, 55, 12, "", Collections.singletonList("Axis")));
-		buttonList.add(texture = new GuiButtonSimple(3, 184 + guiLeft, 6 + guiTop, 55, 12, "", Collections.singletonList("Texture")));
+		buttonList.add(new CommonGuiButton(-1, 194 + guiLeft, 201 + guiTop, 44, 14, "Color").setDesign(Design.SIMPLE).setFrameColor(0xff000000).setButtonColor(part.getActive().color));
+		buttonList.add(particle = new CommonGuiButton(0, 5 + guiLeft, 6 + guiTop, 55, 12, "").setDesign(Design.SIMPLE).setTooltip("Particle Mode"));
+		buttonList.add(redstone = new CommonGuiButton(1, 64 + guiLeft, 6 + guiTop, 55, 12, "").setDesign(Design.SIMPLE).setTooltip("Redstone Mode"));
+		buttonList.add(axis = new CommonGuiButton(2, 124 + guiLeft, 6 + guiTop, 55, 12, "").setDesign(Design.SIMPLE).setTooltip("Axis"));
+		buttonList.add(texture = new CommonGuiButton(3, 184 + guiLeft, 6 + guiTop, 55, 12, "").setDesign(Design.SIMPLE).setTooltip("Texture"));
 		buttonList.add(depth = new GuiCheckBox(4, 120 + guiLeft, 189 + guiTop, "", part.getActive().depth));
 		buttonList.add(collidable = new GuiCheckBox(5, 120 + guiLeft, 202 + guiTop, "", part.getActive().collidable));
 		buttonList.add(reverse = new GuiCheckBox(6, 170 + guiLeft, 189 + guiTop, "", part.getActive().reverse));
@@ -218,29 +218,29 @@ public class GuiSpreader extends CommonGuiScreen {
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-		if (!isShiftKeyDown()) {
+		if (!isShiftKeyDown() || mc.currentScreen != this) {
 			drawDefaultBackground();
 			drawer.drawBackgroundTexture();
 		}
 		super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
 		//position
-		drawer.drawFrame(minXp.xPosition - 12 - guiLeft, minXp.yPosition - 4 - guiTop, 108, 51, 1, Color.gray.getRGB());
-		fontRenderer.drawString("Position", minXp.xPosition - 7, minXp.yPosition - 13, textColor);
-		fontRenderer.drawString("X", minXp.xPosition - 9, minXp.yPosition + 4, textColor);
-		fontRenderer.drawString("Y", minYp.xPosition - 9, minYp.yPosition + 4, textColor);
-		fontRenderer.drawString("Z", minZp.xPosition - 9, minZp.yPosition + 4, textColor);
+		drawer.drawFrame(minXp.x - 12 - guiLeft, minXp.y - 4 - guiTop, 108, 51, 1, Color.gray.getRGB());
+		fontRenderer.drawString("Position", minXp.x - 7, minXp.y - 13, textColor);
+		fontRenderer.drawString("X", minXp.x - 9, minXp.y + 4, textColor);
+		fontRenderer.drawString("Y", minYp.x - 9, minYp.y + 4, textColor);
+		fontRenderer.drawString("Z", minZp.x - 9, minZp.y + 4, textColor);
 		//motion
-		drawer.drawFrame(minXm.xPosition - 12 - guiLeft, minXm.yPosition - 4 - guiTop, 108, 51, 1, Color.gray.getRGB());
-		fontRenderer.drawString("Motion", minXm.xPosition - 7, minXm.yPosition - 13, textColor);
-		fontRenderer.drawString("X", minXm.xPosition - 9, minXm.yPosition + 4, textColor);
-		fontRenderer.drawString("Y", minYm.xPosition - 9, minYm.yPosition + 4, textColor);
-		fontRenderer.drawString("Z", minZm.xPosition - 9, minZm.yPosition + 4, textColor);
+		drawer.drawFrame(minXm.x - 12 - guiLeft, minXm.y - 4 - guiTop, 108, 51, 1, Color.gray.getRGB());
+		fontRenderer.drawString("Motion", minXm.x - 7, minXm.y - 13, textColor);
+		fontRenderer.drawString("X", minXm.x - 9, minXm.y + 4, textColor);
+		fontRenderer.drawString("Y", minYm.x - 9, minYm.y + 4, textColor);
+		fontRenderer.drawString("Z", minZm.x - 9, minZm.y + 4, textColor);
 		//scale
-		drawer.drawFrame(minScale.xPosition - 12 - guiLeft, minScale.yPosition - 4 - guiTop, 108, 19, 1, Color.gray.getRGB());
-		fontRenderer.drawString("Scale", minScale.xPosition - 7, minScale.yPosition - 13, textColor);
+		drawer.drawFrame(minScale.x - 12 - guiLeft, minScale.y - 4 - guiTop, 108, 19, 1, Color.gray.getRGB());
+		fontRenderer.drawString("Scale", minScale.x - 7, minScale.y - 13, textColor);
 		//age
-		drawer.drawFrame(minAge.xPosition - 12 - guiLeft, minAge.yPosition - 4 - guiTop, 108, 19, 1, Color.gray.getRGB());
-		fontRenderer.drawString("Age", minAge.xPosition - 7, minAge.yPosition - 13, textColor);
+		drawer.drawFrame(minAge.x - 12 - guiLeft, minAge.y - 4 - guiTop, 108, 19, 1, Color.gray.getRGB());
+		fontRenderer.drawString("Age", minAge.x - 7, minAge.y - 13, textColor);
 
 		drawString(flounc, "Flouncing");
 		drawString(freq, "Frequency");
@@ -261,11 +261,11 @@ public class GuiSpreader extends CommonGuiScreen {
 	}
 
 	private void drawString(GuiTextField field, String text) {
-		fontRenderer.drawString(text, field.xPosition - (fontRenderer.getStringWidth(text) + 4), field.yPosition + 4, textColor);
+		fontRenderer.drawString(text, field.x - (fontRenderer.getStringWidth(text) + 4), field.y + 4, textColor);
 	}
 
 	private void drawString(GuiCheckBox field, String text) {
-		fontRenderer.drawString(text, field.xPosition + 14, field.yPosition + 3, textColor);
+		fontRenderer.drawString(text, field.x + 14, field.y + 3, textColor);
 	}
 
 	@Override
@@ -314,6 +314,7 @@ public class GuiSpreader extends CommonGuiScreen {
 			part.activeParticle = button.id * -1 - 10;
 			//			toServer();
 			GuiDrawer.openGui(new GuiSpreader(part));
+			return;
 		} else if (button.id == -1)
 			GuiDrawer.openGui(new GuiColor(this));
 		else if (button.id == 0)

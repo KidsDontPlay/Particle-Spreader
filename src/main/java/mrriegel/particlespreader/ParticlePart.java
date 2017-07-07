@@ -3,10 +3,16 @@ package mrriegel.particlespreader;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import mrriegel.limelib.LimeLib;
 import mrriegel.limelib.datapart.DataPart;
 import mrriegel.limelib.helper.ColorHelper;
+import mrriegel.limelib.helper.NBTHelper;
 import mrriegel.limelib.helper.ParticleHelper;
 import mrriegel.limelib.particle.CommonParticle;
 import net.minecraft.block.Block;
@@ -23,20 +29,15 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 public class ParticlePart extends DataPart {
 
 	public int activeParticle = 0;
-	public List<ParticleData> parDatas = Lists.newArrayList();
-	{
-		for (int i = 0; i < 8; i++) {
-			parDatas.add(new ParticleData());
-			if (i != 0)
-				parDatas.get(i).red = Redstone.NEVER;
-		}
-	}
+	public List<ParticleData> parDatas = IntStream.rangeClosed(0, 8).boxed().map(i -> {
+		ParticleData pd = new ParticleData();
+		if (i != 0)
+			pd.red = Redstone.NEVER;
+		return pd;
+	}).collect(Collectors.toList());
 
 	private static Random random = new Random();
 	static Map<String, ResourceLocation> textureMap = Maps.newHashMap();
@@ -54,23 +55,26 @@ public class ParticlePart extends DataPart {
 
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
-		activeParticle = compound.getInteger("active");
-		for (int i = 0; i < 8; i++) {
-			if (compound.hasKey("partdata_" + i))
-				parDatas.get(i).readFromNBT(compound.getCompoundTag("partdata_" + i));
-			parDatas.get(i).correctValues();
-		}
-		if (compound.hasKey("minXPos")) {
-			parDatas.get(0).readFromNBT(compound);
-		}
+		activeParticle = NBTHelper.get(compound, "active", Integer.class);
+		parDatas = NBTHelper.getList(compound, "parts", NBTTagCompound.class).stream().map(n -> {
+			ParticleData pd = new ParticleData();
+			pd.readFromNBT(n);
+			return pd;
+		}).collect(Collectors.toList());
+		//		for (int i = 0; i < 8; i++) {
+		//			if (compound.hasKey("partdata_" + i))
+		//				parDatas.get(i).readFromNBT(compound.getCompoundTag("partdata_" + i));
+		//		}
 		super.readFromNBT(compound);
 	}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
-		for (int i = 0; i < 8; i++)
-			compound.setTag("partdata_" + i, parDatas.get(i).writeToNBT(new NBTTagCompound()));
-		compound.setInteger("active", activeParticle);
+		//		for (int i = 0; i < 8; i++)
+		//			compound.setTag("partdata_" + i, parDatas.get(i).writeToNBT(new NBTTagCompound()));
+		//		compound.setInteger("active", activeParticle);
+		NBTHelper.set(compound, "active", activeParticle);
+		NBTHelper.setList(compound, "parts", parDatas.stream().map(d -> d.writeToNBT(new NBTTagCompound())).collect(Collectors.toList()));
 		return super.writeToNBT(compound);
 	}
 
@@ -111,7 +115,7 @@ public class ParticlePart extends DataPart {
 			}
 			case CIRCLE: {
 				for (Vec3d vec : ParticleHelper.getVecsForCircle(posX(parD), posY(parD), posZ(parD), parD.radius, parD.frequency, parD.ax)) {
-					CommonParticle par = new CommonParticle(vec.xCoord, vec.yCoord, vec.zCoord, MathHelper.nextDouble(random, parD.minXMotion, parD.maxXMotion), MathHelper.nextDouble(random, parD.minYMotion, parD.maxYMotion), MathHelper.nextDouble(random, parD.minZMotion, parD.maxZMotion));
+					CommonParticle par = new CommonParticle(vec.x, vec.y, vec.z, MathHelper.nextDouble(random, parD.minXMotion, parD.maxXMotion), MathHelper.nextDouble(random, parD.minYMotion, parD.maxYMotion), MathHelper.nextDouble(random, parD.minZMotion, parD.maxZMotion));
 					applyValues(par, parD);
 					LimeLib.proxy.renderParticle(par);
 				}
@@ -119,7 +123,7 @@ public class ParticlePart extends DataPart {
 			}
 			case SQUARE: {
 				for (Vec3d vec : ParticleHelper.getVecsForSquare(posX(parD), posY(parD), posZ(parD), parD.radius, parD.frequency, parD.ax)) {
-					CommonParticle par = new CommonParticle(vec.xCoord, vec.yCoord, vec.zCoord, MathHelper.nextDouble(random, parD.minXMotion, parD.maxXMotion), MathHelper.nextDouble(random, parD.minYMotion, parD.maxYMotion), MathHelper.nextDouble(random, parD.minZMotion, parD.maxZMotion));
+					CommonParticle par = new CommonParticle(vec.x, vec.y, vec.z, MathHelper.nextDouble(random, parD.minXMotion, parD.maxXMotion), MathHelper.nextDouble(random, parD.minYMotion, parD.maxYMotion), MathHelper.nextDouble(random, parD.minZMotion, parD.maxZMotion));
 					applyValues(par, parD);
 					LimeLib.proxy.renderParticle(par);
 				}
@@ -127,7 +131,7 @@ public class ParticlePart extends DataPart {
 			}
 			case SPIRAL1: {
 				Vec3d vec = ParticleHelper.getVecForSpirale(parD.radius / 25., parD.spinSpeed / 10., parD.frequency + 40., parD.reverse, parD.ax);
-				CommonParticle par = new CommonParticle(posX(parD), posY(parD), posZ(parD), parD.ax == Axis.X ? motionX(parD) : vec.xCoord, parD.ax == Axis.Y ? motionY(parD) : vec.yCoord, parD.ax == Axis.Z ? motionZ(parD) : vec.zCoord);
+				CommonParticle par = new CommonParticle(posX(parD), posY(parD), posZ(parD), parD.ax == Axis.X ? motionX(parD) : vec.x, parD.ax == Axis.Y ? motionY(parD) : vec.y, parD.ax == Axis.Z ? motionZ(parD) : vec.z);
 				applyValues(par, parD);
 				LimeLib.proxy.renderParticle(par);
 				break;
@@ -137,14 +141,14 @@ public class ParticlePart extends DataPart {
 				int index = ((int) ((ticksExisted) * (parD.spinSpeed * 10.1))) % lis.size();
 				//			index=ticksExisted%lis.size();
 				Vec3d vec = lis.get(index);
-				CommonParticle par = new CommonParticle(vec.xCoord, vec.yCoord, vec.zCoord, MathHelper.nextDouble(random, parD.minXMotion, parD.maxXMotion), MathHelper.nextDouble(random, parD.minYMotion, parD.maxYMotion), MathHelper.nextDouble(random, parD.minZMotion, parD.maxZMotion));
+				CommonParticle par = new CommonParticle(vec.x, vec.y, vec.z, MathHelper.nextDouble(random, parD.minXMotion, parD.maxXMotion), MathHelper.nextDouble(random, parD.minYMotion, parD.maxYMotion), MathHelper.nextDouble(random, parD.minZMotion, parD.maxZMotion));
 				applyValues(par, parD);
 				LimeLib.proxy.renderParticle(par);
 				break;
 			}
 			case EXPLOSION: {
 				for (Vec3d vec : ParticleHelper.getVecsForExplosion(parD.radius / 25., parD.frequency + 20., parD.ax)) {
-					CommonParticle par = new CommonParticle(posX(parD), posY(parD), posZ(parD), parD.ax == Axis.X ? motionX(parD) : vec.xCoord, parD.ax == Axis.Y ? motionY(parD) : vec.yCoord, parD.ax == Axis.Z ? motionZ(parD) : vec.zCoord);
+					CommonParticle par = new CommonParticle(posX(parD), posY(parD), posZ(parD), parD.ax == Axis.X ? motionX(parD) : vec.x, parD.ax == Axis.Y ? motionY(parD) : vec.y, parD.ax == Axis.Z ? motionZ(parD) : vec.z);
 					applyValues(par, parD);
 					LimeLib.proxy.renderParticle(par);
 				}

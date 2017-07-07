@@ -73,7 +73,7 @@ public class ClientProxy extends CommonProxy {
 					GlStateManager.scale(0.5F, 0.5F, 0.5F);
 					//				GlStateManager.pushAttrib();
 					RenderHelper.enableStandardItemLighting();
-					itemRenderer.renderItem(entityitem.getEntityItem(), ItemCameraTransforms.TransformType.FIXED);
+					itemRenderer.renderItem(entityitem.getItem(), ItemCameraTransforms.TransformType.FIXED);
 					RenderHelper.disableStandardItemLighting();
 					//				GlStateManager.popAttrib();
 					GlStateManager.enableLighting();
