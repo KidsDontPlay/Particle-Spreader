@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = ParticleSpreader.MODID, name = ParticleSpreader.MODNAME, version = ParticleSpreader.VERSION, dependencies = "required-after:limelib@[1.7.3,)")
+@Mod(modid = ParticleSpreader.MODID, name = ParticleSpreader.MODNAME, version = ParticleSpreader.VERSION, acceptedMinecraftVersions = "[1.12,1.13)", dependencies = "required-after:limelib@[1.7.3,)")
 public class ParticleSpreader {
 	public static final String MODID = "particlespreader";
 	public static final String VERSION = "1.2.0";
